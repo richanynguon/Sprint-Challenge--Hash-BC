@@ -5,6 +5,7 @@ import sys
 
 from uuid import uuid4
 
+
 from timeit import default_timer as timer
 
 import random
@@ -20,13 +21,17 @@ def proof_of_work(last_proof):
     - Use the same method to generate SHA-256 hashes as the examples in class
     """
 
-    start = timer()
+    # start = timer()
 
-    print("Searching for next proof")
-    proof = 0
+    # print("Searching for next proof")
+    # proof = 0
     #  TODO: Your code here
-
-    print("Proof found: " + str(proof) + " in " + str(timer() - start))
+    proof = random.getrandbits(256)
+    prev_proof = f'{last_proof}'.encode()
+    prev_hash = hashlib.sha256(prev_proof).hexdigest()
+    while not valid_proof(prev_hash, proof):
+        proof = random.getrandbits(256)
+    # print("Proof found: " + str(proof) + " in " + str(timer() - start))
     return proof
 
 
@@ -39,8 +44,9 @@ def valid_proof(last_hash, proof):
     IE:  last_hash: ...AE9123456, new hash 123456E88...
     """
 
-    # TODO: Your code here!
-    pass
+    guess_string = f'{proof}'.encode()
+    guess_hash = hashlib.sha256(guess_string).hexdigest()
+    return last_hash[-6:] == guess_hash[:6]
 
 
 if __name__ == '__main__':
@@ -51,7 +57,6 @@ if __name__ == '__main__':
         node = "https://lambda-coin.herokuapp.com/api"
 
     coins_mined = 0
-
     # Load or create ID
     f = open("my_id.txt", "r")
     id = f.read()
